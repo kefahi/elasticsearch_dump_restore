@@ -13,7 +13,7 @@ SRC_DUMP=$4
 DST_ENTRIES=$(curl -s "http://${DST_HOST}:9200/${DST_INDEX}/${DST_TYPE}/_search?q=*&size=0" | jq .hits.total)
 
 echo "Found $DST_ENTRIES entries in destintation before copying"
-curl -XPUT http://${DST_HOST}:9200/${DST_INDEX}/_mapping/${DST_TYPE} --data-binary @${SRC_DUMP}.mapping
+curl -XPUT http://${DST_HOST}:9200/${DST_INDEX}/ --data-binary @${SRC_DUMP}.index
 curl -XPUT http://${DST_HOST}:9200/_bulk --data-binary @${SRC_DUMP}
 DST_ENTRIES=$(curl -s "http://${DST_HOST}:9200/${DST_INDEX}/${DST_TYPE}/_search?q=*&size=0" | jq .hits.total)
 echo "Found $DST_ENTRIES entries in destintation after copying"
