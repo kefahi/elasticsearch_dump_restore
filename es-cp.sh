@@ -17,6 +17,7 @@ DST_ENTRIES=$(curl -s "http://${DST_HOST}:9200/${DST_INDEX}/${DST_TYPE}/_search?
 
 echo "Found $SRC_ENTRIES entries in source"
 echo "Found $DST_ENTRIES entries in destintation before copying"
+curl -s -XGET "http://${SRC_HOST}:9200/${SRC_INDEX}/_mapping/${SRC_TYPE}" | jq -c .${SRC_INDEX} | curl -XPUT "http://${DST_HOST}:9200/${DST_INDEX}/_mapping/${DST_TYPE}" --data-binary @-
 curl -s -XGET "http://${SRC_HOST}:9200/${SRC_INDEX}/${SRC_TYPE}/_search?scroll=1m" -d '{"query":{"match_all": {}},"sort" : ["_doc"], "size":  10000000}'  | jq -c '.hits.hits[]._source' |  jq -c "{\"index\":{\"_index\":\"${DST_INDEX}\", \"_type\":\"${DST_TYPE}\",\"_id\": .id}}, ." | curl -XPUT http://${DST_HOST}:9200/_bulk --data-binary @-
 DST_ENTRIES=$(curl -s "http://${DST_HOST}:9200/${DST_INDEX}/${DST_TYPE}/_search?q=*&size=0" | jq .hits.total)
 echo "Found $DST_ENTRIES entries in destintation after copying"
